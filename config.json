@@ -10,7 +10,7 @@
     "obs_source_name": "SFX Audio 1",
     "library_map": {
         "poop": "cmn_poop.mp3",
-        "angry": "ft_AngryAsianMa.mp3",
+        "angry": "ft_AngryAsianMan.mp3",
         "doom": "ft_Doom.mp3",
         "fart": "ft_FartZone.mp3",
         "hell": "ft_Hell.mp3",
