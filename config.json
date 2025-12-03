@@ -9,17 +9,5 @@
     "cleanup_days": 3,
     "obs_group_name": "SFX",
     "obs_source_name": "SFX Audio 1",
-    "library_map": {
-        "poop": "cmn_poop.mp3",
-        "angry": "ft_AngryAsianMan.mp3",
-        "doom": "ft_Doom.mp3",
-        "fart": "ft_FartZone.mp3",
-        "hell": "ft_Hell.mp3",
-        "hysterical": "ft_HystericalBreakup.mp3",
-        "mariachi": "ft_MariachiBand.mp3",
-        "massacre": "ft_Massacre.mp3",
-        "vomit": "ft_VomitBlast.mp3",
-        "pill": "pill_sharp.mp3",
-        "kkk": "ft_schizo.mp3"
-    }
+    "enable_local_library": true
 }

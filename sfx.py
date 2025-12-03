@@ -101,24 +101,33 @@ class SFXHandler:
         return 5.0
 
     def get_library_match(self, prompt):
-        mapping = self.conf.get("library_map", {})
+        if not self.conf.get("enable_local_library", True):
+            return None
+
         cleaned_prompt = prompt.lower().strip()
         
-        # Strict match only
-        if cleaned_prompt in mapping:
-            f_path = LIBRARY_DIR / mapping[cleaned_prompt]
-            if f_path.exists(): return f_path
-            
+        try:
+            # Iterate over all MP3 files in the library
+            for file_path in LIBRARY_DIR.glob("*.mp3"):
+                # file_path.stem is the filename without extension (e.g. 'pill_sharp')
+                if file_path.stem.lower() == cleaned_prompt:
+                    logger.info(f"Library match found: {file_path.name}")
+                    return file_path
+        except Exception as e:
+            logger.error(f"Error scanning library: {e}")
+
         return None
 
     def generate_audio(self, prompt, user):
         if self.conf.get("test_mode", False):
             return None, "TEST_MODE"
 
+        # Check local library first
         lib_file = self.get_library_match(prompt)
         if lib_file:
             return lib_file, "LIBRARY"
 
+        # Fallback to ElevenLabs API
         api_key = self.conf.get("elevenlabs_api_key")
         if not api_key: return None, "NO_API_KEY"
 
@@ -147,7 +156,6 @@ class SFXHandler:
 
                 return filepath, "SUCCESS"
             else:
-                # --- UPDATED ERROR PARSING ---
                 error_text = res.text.lower()
                 
                 if "quota" in error_text:
@@ -159,7 +167,6 @@ class SFXHandler:
                 
                 logger.warning(f"API Error: {res.text[:100]}")
                 return None, err
-                # -----------------------------
 
         except Exception as e:
             logger.error(f"Request Error: {e}")
@@ -228,7 +235,7 @@ def main():
     if status == "SUCCESS":
         status_msg = f"🔊 Playing: {prompt}"
     elif status == "LIBRARY":
-        status_msg = f"🔊 Library: {prompt}"
+        status_msg = f"🔊 Sound: {prompt}"
     elif filepath is None:
         status_msg = f"❌ Failed: {status[:50]}"
     else:
