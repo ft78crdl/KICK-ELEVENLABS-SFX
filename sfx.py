@@ -126,7 +126,11 @@ class SFXHandler:
             res = requests.post(
                 "https://api.elevenlabs.io/v1/sound-generation",
                 headers={"xi-api-key": api_key, "Content-Type": "application/json"},
-                json={"text": prompt, "duration_seconds": self.conf.get("max_duration", 10)},
+                json={
+                    "text": prompt, 
+                    "duration_seconds": self.conf.get("max_duration", 10),
+                    "prompt_influence": self.conf.get("prompt_influence", 0.3) 
+                },
                 timeout=15
             )
             
@@ -143,9 +147,19 @@ class SFXHandler:
 
                 return filepath, "SUCCESS"
             else:
-                err = "QUOTA_EXCEEDED" if "quota" in res.text.lower() else f"API_{res.status_code}"
+                # --- UPDATED ERROR PARSING ---
+                error_text = res.text.lower()
+                
+                if "quota" in error_text:
+                    err = "QUOTA_EXCEEDED"
+                elif "moderation" in error_text:
+                    err = "MODERATION_BLOCKED"
+                else:
+                    err = f"API_{res.status_code}"
+                
                 logger.warning(f"API Error: {res.text[:100]}")
                 return None, err
+                # -----------------------------
 
         except Exception as e:
             logger.error(f"Request Error: {e}")
@@ -228,4 +242,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
