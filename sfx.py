@@ -100,7 +100,7 @@ class SFXHandler:
 
         return 5.0
 
-    def get_library_match(self, prompt):
+def get_library_match(self, prompt):
         mapping = self.conf.get("library_map", {})
         cleaned_prompt = prompt.lower().strip()
         
@@ -108,10 +108,6 @@ class SFXHandler:
             f_path = LIBRARY_DIR / mapping[cleaned_prompt]
             if f_path.exists(): return f_path
             
-        for key, filename in mapping.items():
-            if key in cleaned_prompt:
-                f_path = LIBRARY_DIR / filename
-                if f_path.exists(): return f_path
         return None
 
     def generate_audio(self, prompt, user):
