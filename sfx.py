@@ -25,7 +25,7 @@ CONFIG_FILE = SCRIPT_DIR / "config.json"
 OUTPUT_DIR = SCRIPT_DIR / "sfx_temp"
 LIBRARY_DIR = SCRIPT_DIR / "sfx_library"
 LOG_DIR = SCRIPT_DIR / "logs"
-STATUS_FILE = SCRIPT_DIR / "sfx_status.txt"  # <--- Restored this
+STATUS_FILE = SCRIPT_DIR / "sfx_status.txt"
 
 # Ensure directories exist
 OUTPUT_DIR.mkdir(exist_ok=True)
@@ -100,10 +100,11 @@ class SFXHandler:
 
         return 5.0
 
-def get_library_match(self, prompt):
+    def get_library_match(self, prompt):
         mapping = self.conf.get("library_map", {})
         cleaned_prompt = prompt.lower().strip()
         
+        # Strict match only
         if cleaned_prompt in mapping:
             f_path = LIBRARY_DIR / mapping[cleaned_prompt]
             if f_path.exists(): return f_path
@@ -227,3 +228,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
