@@ -7,8 +7,8 @@
     },
     
     "sfx_generation": {
-        "max_duration": 20,
-        "prompt_influence": 0.5,
+        "max_duration": 23,
+        "prompt_influence": 0.57,
         "enable_local_library": true
     },
     
