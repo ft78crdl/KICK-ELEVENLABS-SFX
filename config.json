@@ -1,13 +1,28 @@
 {
-    "elevenlabs_api_key": "",
-    "prompt_influence": 0.65,
-    "obs_host": "localhost",
-    "obs_port": 4455,
-    "obs_password": "",
-    "max_duration": 20,
-    "test_mode": false,
-    "cleanup_days": 3,
-    "obs_group_name": "SFX",
-    "obs_source_name": "SFX Audio 1",
-    "enable_local_library": true
+    "elevenlabs_api_key": "YOUR_ELEVENLABS_API_KEY_HERE",
+    
+    "server": {
+        "host": "0.0.0.0",
+        "port": 5123
+    },
+    
+    "sfx_generation": {
+        "max_duration": 20,
+        "prompt_influence": 0.5,
+        "enable_local_library": true
+    },
+    
+    "overlay": {
+        "enabled": false,
+        "template": "minimal",
+        "show_prompt": true,
+        "show_sender": true,
+        "display_duration_after_audio": 2000,
+        "position": "bottom-left"
+    },
+    
+    "logging": {
+        "enabled": true,
+        "log_file": "logs/sfx_log.txt"
+    }
 }

@@ -4,4 +4,6 @@ dist/
 pycache/
 *.pyc
 sfx_temp/
-logs/
+logs/*
+!logs/.gitkeep
+audio_cache/

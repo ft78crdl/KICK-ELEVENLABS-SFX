@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SFX Widget - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            color: #53fc18;
+            font-weight: 700;
+        }
+
+        .card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            color: #53fc18;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .status-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .status-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #53fc18;
+        }
+
+        .status-label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5px;
+        }
+
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .config-table td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .config-table td:first-child {
+            color: rgba(255, 255, 255, 0.7);
+            width: 40%;
+        }
+
+        .config-table td:last-child {
+            font-family: 'Consolas', monospace;
+            color: #53fc18;
+        }
+
+        .url-box {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            word-break: break-all;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .url-box code {
+            flex: 1;
+            color: #53fc18;
+        }
+
+        .copy-btn {
+            background: #53fc18;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .copy-btn:hover {
+            background: #45d615;
+        }
+
+        .test-section {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .test-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #262626;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .test-input:focus {
+            outline: none;
+            border-color: #53fc18;
+        }
+
+        .test-btn {
+            background: #53fc18;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+        }
+
+        .test-btn:hover {
+            opacity: 0.9;
+        }
+
+        .test-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        #test-result.success {
+            display: block;
+            background: rgba(83, 252, 24, 0.2);
+            border: 1px solid #53fc18;
+        }
+
+        #test-result.error {
+            display: block;
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid #ff4444;
+        }
+
+        .note {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 10px;
+        }
+
+        /* SFX Grid Styling */
+        .sfx-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .sfx-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(83, 252, 24, 0.3);
+            border-radius: 8px;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+
+        .sfx-item:hover {
+            border-color: #53fc18;
+            background: rgba(83, 252, 24, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .sfx-name {
+            color: #53fc18;
+            font-weight: 500;
+            font-family: 'Consolas', monospace;
+        }
+
+        .sfx-play {
+            background: #53fc18;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sfx-play:hover {
+            background: #45d615;
+            transform: scale(1.05);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            padding: 30px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-style: italic;
+        }
+
+        .empty-state .emoji {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .streamerbot-code {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            white-space: pre;
+            color: #e0e0e0;
+        }
+
+        .streamerbot-code .key {
+            color: #999;
+        }
+
+        .streamerbot-code .value {
+            color: #53fc18;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔊 SFX Widget Admin</h1>
+
+        <!-- Status Section -->
+        <div class="card">
+            <h2>Status</h2>
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-value" id="clients">{{ connected_clients }}</div>
+                    <div class="status-label">Connected Widgets</div>
+                </div>
+                <div class="status-item">
+                    <div class="status-value">{{ local_sfx_count }}</div>
+                    <div class="status-label">Local SFX Files</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- URLs Section -->
+        <div class="card">
+            <h2>URLs</h2>
+            
+            <p style="margin-bottom: 10px; color: rgba(255,255,255,0.7);">Widget URL (add as Browser Source):</p>
+            <div class="url-box">
+                <code id="widget-url">http://{{ config.server.host if config.server.host != '0.0.0.0' else '127.0.0.1' }}:{{ config.server.port }}/</code>
+                <button class="copy-btn" onclick="copyUrl('widget-url')">Copy</button>
+            </div>
+        </div>
+
+        <!-- Test Section -->
+        <div class="card">
+            <h2>Test SFX</h2>
+            <div class="test-section">
+                <input type="text" id="test-prompt" class="test-input" placeholder="Enter test prompt..." value="explosion">
+                <input type="text" id="test-sender" class="test-input" placeholder="Sender name" value="Admin" style="max-width: 150px;">
+                <button class="test-btn" id="test-btn" onclick="testSfx()">Test SFX</button>
+            </div>
+            <div id="test-result"></div>
+            <p class="note">Make sure you have the widget open in OBS or a browser tab to hear the sound.</p>
+        </div>
+
+        <!-- Local SFX Files Section -->
+        <div class="card">
+            <h2>Local SFX Library</h2>
+            <div id="local-sfx-container">
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 15px;">
+                    Files in <code>sfx_library/</code> folder:
+                </p>
+                <div id="sfx-list" class="sfx-grid">
+                    Loading...
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Section -->
+        <div class="card">
+            <h2>Current Configuration</h2>
+            <table class="config-table">
+                <tr>
+                    <td>Max Duration</td>
+                    <td>{{ config.sfx_generation.max_duration }} seconds</td>
+                </tr>
+                <tr>
+                    <td>Prompt Influence</td>
+                    <td>{{ config.sfx_generation.prompt_influence }}</td>
+                </tr>
+                <tr>
+                    <td>Local Library</td>
+                    <td>{{ "Enabled" if config.sfx_generation.enable_local_library else "Disabled" }}</td>
+                </tr>
+                <tr>
+                    <td>Overlay</td>
+                    <td>{{ "Enabled" if config.overlay.enabled else "Disabled" }}</td>
+                </tr>
+                <tr>
+                    <td>Overlay Position</td>
+                    <td>{{ config.overlay.position }}</td>
+                </tr>
+                <tr>
+                    <td>Overlay Template</td>
+                    <td>{{ config.overlay.template or "dark" }}</td>
+                </tr>
+            </table>
+            <p class="note">Edit config.json and restart the server to change settings, or call /reload-config to reload without restart.</p>
+    </div>
+
+    <script>
+        function copyUrl(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = originalText, 1500);
+            });
+        }
+
+        async function testSfx() {
+            const prompt = document.getElementById('test-prompt').value;
+            const sender = document.getElementById('test-sender').value;
+            const btn = document.getElementById('test-btn');
+            const result = document.getElementById('test-result');
+
+            if (!prompt) {
+                result.className = 'error';
+                result.textContent = 'Please enter a prompt';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Generating...';
+            result.style.display = 'none';
+
+            try {
+                const response = await fetch('/trigger', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt, sender })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    result.className = 'success';
+                    result.textContent = `✓ SFX triggered! ${data.is_local ? '(Local file)' : '(Generated)'} Duration: ${data.duration?.toFixed(1)}s`;
+                } else {
+                    result.className = 'error';
+                    result.textContent = `✗ Error: ${data.error}`;
+                }
+            } catch (error) {
+                result.className = 'error';
+                result.textContent = `✗ Request failed: ${error.message}`;
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Test SFX';
+        }
+
+        // Auto-refresh status
+        async function refreshStatus() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                document.getElementById('clients').textContent = data.connected_clients;
+            } catch (e) {}
+        }
+
+        // Load and display local SFX files
+        async function loadLocalSfx() {
+            try {
+                const response = await fetch('/sounds');
+                const data = await response.json();
+                
+                const container = document.getElementById('sfx-list');
+                
+                if (data.count === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <span class="emoji">🔇</span>
+                            No local SFX files found.<br>
+                            Add MP3 files to the <code>sfx_library/</code> folder.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = data.sounds.map(sound => `
+                    <div class="sfx-item">
+                        <span class="sfx-name">${sound}</span>
+                        <button class="sfx-play" onclick="playLocalSfx('${sound}')">Play</button>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                document.getElementById('sfx-list').innerHTML = `
+                    <div class="empty-state">
+                        <span class="emoji">⚠️</span>
+                        Failed to load local SFX files
+                    </div>
+                `;
+            }
+        }
+
+        // Play a specific local SFX file
+        async function playLocalSfx(soundName) {
+            try {
+                // Remove .mp3 extension for prompt matching
+                const prompt = soundName.replace(/\.mp3$/i, '');
+                
+                const response = await fetch('/trigger', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt, sender: 'Admin' })
+                });
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    const testResult = document.getElementById('test-result');
+                    testResult.className = 'error';
+                    testResult.textContent = `❌ Failed to play ${soundName}: ${result.error}`;
+                }
+            } catch (error) {
+                const testResult = document.getElementById('test-result');
+                testResult.className = 'error';
+                testResult.textContent = `❌ Error playing ${soundName}: ${error.message}`;
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLocalSfx();
+        });
+
+        setInterval(refreshStatus, 5000);
+    </script>
+</body>
+</html>

@@ -2,3 +2,4 @@
 
 📓 [Setup guide](https://github.com/ft78crdl/KICK-ELEVENLABS-SFX/wiki/Installation)  
 🤓 [Usage guide/tips](https://github.com/ft78crdl/KICK-ELEVENLABS-SFX/wiki/Usage)
+💬 [Usage guide/tips](https://github.com/ft78crdl/KICK-ELEVENLABS-SFX/wiki/Commands)

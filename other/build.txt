@@ -1,2 +1,2 @@
 cd "C:\temp\_repos\KICK-ELEVENLABS-SFX\KICK-ELEVENLABS-SFX"
-py -m PyInstaller --onefile --noconsole --name "StreamerBotSFX" sfx.py
+py -m PyInstaller --onefile --noconsole --name "SFXServer" server.py

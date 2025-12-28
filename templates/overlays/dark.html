@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SFX Widget</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: transparent;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Container positioning */
+        #sfx-container {
+            position: fixed;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+            z-index: 9999;
+            max-width: 400px;
+        }
+
+        #sfx-container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Position variants */
+        #sfx-container.bottom-left {
+            bottom: 20px;
+            left: 20px;
+        }
+
+        #sfx-container.bottom-right {
+            bottom: 20px;
+            right: 20px;
+        }
+
+        #sfx-container.top-left {
+            top: 20px;
+            left: 20px;
+        }
+
+        #sfx-container.top-right {
+            top: 20px;
+            right: 20px;
+        }
+
+        #sfx-container.center {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #sfx-container.center.visible {
+            transform: translate(-50%, -50%);
+        }
+
+        #sfx-container.bottom-center {
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+        }
+
+        #sfx-container.bottom-center.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #sfx-container.top-center {
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+        }
+
+        #sfx-container.top-center.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Theme: Dark */
+        .theme-dark .sfx-box {
+            background: linear-gradient(135deg, rgba(30, 30, 40, 0.95) 0%, rgba(20, 20, 30, 0.98) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .theme-dark .sfx-prompt {
+            color: #ffffff;
+        }
+
+        .theme-dark .sfx-sender {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .theme-dark .sfx-icon {
+            color: #00d4ff;
+        }
+
+        /* Theme: Light */
+        .theme-light .sfx-box {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 245, 250, 0.98) 100%);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .theme-light .sfx-prompt {
+            color: #1a1a2e;
+        }
+
+        .theme-light .sfx-sender {
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .theme-light .sfx-icon {
+            color: #6366f1;
+        }
+
+        /* Theme: Neon */
+        .theme-neon .sfx-box {
+            background: linear-gradient(135deg, rgba(10, 10, 20, 0.95) 0%, rgba(20, 10, 30, 0.98) 100%);
+            border: 2px solid #ff00ff;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3), 0 0 40px rgba(0, 255, 255, 0.2);
+        }
+
+        .theme-neon .sfx-prompt {
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .theme-neon .sfx-sender {
+            color: #ff00ff;
+        }
+
+        .theme-neon .sfx-icon {
+            color: #ff00ff;
+            animation: neon-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes neon-pulse {
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 5px #ff00ff); }
+            50% { opacity: 0.8; filter: drop-shadow(0 0 15px #ff00ff); }
+        }
+
+        /* Theme: Kick (purple/green) */
+        .theme-kick .sfx-box {
+            background: linear-gradient(135deg, rgba(30, 20, 50, 0.95) 0%, rgba(20, 30, 20, 0.98) 100%);
+            border: 2px solid #53fc18;
+            box-shadow: 0 8px 32px rgba(83, 252, 24, 0.2);
+        }
+
+        .theme-kick .sfx-prompt {
+            color: #ffffff;
+        }
+
+        .theme-kick .sfx-sender {
+            color: #53fc18;
+        }
+
+        .theme-kick .sfx-icon {
+            color: #53fc18;
+        }
+
+        /* Theme: Minimal */
+        .theme-minimal .sfx-box {
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            box-shadow: none;
+            border-radius: 4px !important;
+        }
+
+        .theme-minimal .sfx-prompt {
+            color: #ffffff;
+            font-weight: 400;
+        }
+
+        .theme-minimal .sfx-sender {
+            display: none;
+        }
+
+        .theme-minimal .sfx-icon {
+            display: none;
+        }
+
+        /* SFX Box styling */
+        .sfx-box {
+            padding: 16px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .sfx-icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+        }
+
+        .sfx-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor;
+        }
+
+        .sfx-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .sfx-prompt {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.4;
+            word-wrap: break-word;
+            margin-bottom: 4px;
+        }
+
+        .sfx-sender {
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .sfx-sender::before {
+            content: "🔊 ";
+        }
+
+        /* Audio visualizer (optional decorative element) */
+        .audio-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 20px;
+            margin-left: auto;
+            padding-left: 12px;
+        }
+
+        .audio-bar {
+            width: 3px;
+            background: currentColor;
+            border-radius: 2px;
+            animation: audio-bounce 0.5s ease-in-out infinite;
+        }
+
+        .audio-bar:nth-child(1) { animation-delay: 0s; height: 8px; }
+        .audio-bar:nth-child(2) { animation-delay: 0.1s; height: 16px; }
+        .audio-bar:nth-child(3) { animation-delay: 0.2s; height: 12px; }
+        .audio-bar:nth-child(4) { animation-delay: 0.15s; height: 18px; }
+        .audio-bar:nth-child(5) { animation-delay: 0.05s; height: 10px; }
+
+        @keyframes audio-bounce {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.5); }
+        }
+
+        .audio-bars.paused .audio-bar {
+            animation: none;
+            height: 4px !important;
+        }
+
+        /* Connection status indicator */
+        #connection-status {
+            position: fixed;
+            top: 5px;
+            right: 5px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff4444;
+            opacity: 0.5;
+            transition: background 0.3s;
+        }
+
+        #connection-status.connected {
+            background: #44ff44;
+        }
+
+        /* Hide connection indicator in production */
+        body:not(.debug) #connection-status {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Connection indicator (hidden by default) -->
+    <div id="connection-status"></div>
+
+    <!-- Main SFX container -->
+    <div id="sfx-container" class="theme-{{ config.theme or 'dark' }} {{ config.position or 'bottom-left' }}">
+        <div class="sfx-box">
+            <div class="sfx-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                </svg>
+            </div>
+            <div class="sfx-content">
+                <div class="sfx-prompt" id="prompt-text"></div>
+                <div class="sfx-sender" id="sender-text"></div>
+            </div>
+            <div class="audio-bars paused" id="audio-bars">
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+                <div class="audio-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio element -->
+    <audio id="sfx-audio" preload="none"></audio>
+
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    
+    <script>
+        // Configuration from server
+        const overlayEnabled = {{ config.enabled | default(true) | tojson }};
+        const showPrompt = {{ config.show_prompt | default(true) | tojson }};
+        const showSender = {{ config.show_sender | default(true) | tojson }};
+        
+        // Elements
+        const container = document.getElementById('sfx-container');
+        const audio = document.getElementById('sfx-audio');
+        const promptText = document.getElementById('prompt-text');
+        const senderText = document.getElementById('sender-text');
+        const audioBars = document.getElementById('audio-bars');
+        const connectionStatus = document.getElementById('connection-status');
+        
+        // State
+        let hideTimeout = null;
+        let isPlaying = false;
+        
+        // Connect to WebSocket server
+        const socket = io({
+            reconnection: true,
+            reconnectionAttempts: Infinity,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000
+        });
+        
+        // Connection handlers
+        socket.on('connect', () => {
+            console.log('Connected to SFX server');
+            connectionStatus.classList.add('connected');
+        });
+        
+        socket.on('disconnect', () => {
+            console.log('Disconnected from SFX server');
+            connectionStatus.classList.remove('connected');
+        });
+        
+        socket.on('connect_error', (error) => {
+            console.error('Connection error:', error);
+        });
+        
+        // SFX playback handler
+        socket.on('play_sfx', (data) => {
+            console.log('Received SFX:', data);
+            
+            // Clear any pending hide
+            if (hideTimeout) {
+                clearTimeout(hideTimeout);
+                hideTimeout = null;
+            }
+            
+            // Update overlay content
+            if (data.show_overlay && overlayEnabled) {
+                if (showPrompt && data.prompt) {
+                    promptText.textContent = data.prompt;
+                    promptText.style.display = 'block';
+                } else {
+                    promptText.style.display = 'none';
+                }
+                
+                if (showSender && data.sender) {
+                    senderText.textContent = data.sender;
+                    senderText.style.display = 'block';
+                } else {
+                    senderText.style.display = 'none';
+                }
+                
+                // Show overlay
+                container.classList.add('visible');
+                audioBars.classList.remove('paused');
+            }
+            
+            // Play audio (always, regardless of overlay setting)
+            audio.src = data.audio_url;
+            audio.play().then(() => {
+                isPlaying = true;
+                console.log('Audio playing');
+            }).catch((error) => {
+                console.error('Audio playback error:', error);
+                // Still hide overlay after timeout if audio fails
+                scheduleHide(data.display_duration_after_audio || 2000);
+            });
+        });
+        
+        // Audio event handlers
+        audio.addEventListener('ended', () => {
+            console.log('Audio ended');
+            isPlaying = false;
+            audioBars.classList.add('paused');
+            
+            // Get the display duration from the last received data or use default
+            scheduleHide(2000);
+        });
+        
+        audio.addEventListener('error', (e) => {
+            console.error('Audio error:', e);
+            isPlaying = false;
+            audioBars.classList.add('paused');
+            scheduleHide(1000);
+        });
+        
+        audio.addEventListener('play', () => {
+            audioBars.classList.remove('paused');
+        });
+        
+        audio.addEventListener('pause', () => {
+            audioBars.classList.add('paused');
+        });
+        
+        // Helper function to schedule hiding the overlay
+        function scheduleHide(delay) {
+            if (hideTimeout) {
+                clearTimeout(hideTimeout);
+            }
+            
+            hideTimeout = setTimeout(() => {
+                container.classList.remove('visible');
+                hideTimeout = null;
+            }, delay);
+        }
+        
+        // Ping to keep connection alive
+        setInterval(() => {
+            if (socket.connected) {
+                socket.emit('ping');
+            }
+        }, 30000);
+        
+        // Debug: Add keyboard shortcut to toggle debug mode
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'd' && e.ctrlKey && e.shiftKey) {
+                document.body.classList.toggle('debug');
+            }
+        });
+        
+        console.log('SFX Widget initialized');
+        console.log('Overlay enabled:', overlayEnabled);
+        console.log('Show prompt:', showPrompt);
+        console.log('Show sender:', showSender);
+    </script>
+</body>
+</html>
