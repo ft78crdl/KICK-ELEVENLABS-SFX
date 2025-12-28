@@ -73,7 +73,26 @@ app = Flask(__name__,
             static_folder=str(STATIC_DIR))
 app.config['SECRET_KEY'] = str(uuid.uuid4())
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+# Initialize SocketIO with maximum compatibility
+try:
+    # Simple initialization without specifying async_mode
+    socketio = SocketIO(app, 
+                       cors_allowed_origins="*",
+                       logger=False, 
+                       engineio_logger=False,
+                       ping_timeout=60,
+                       ping_interval=25)
+    logger.info("SocketIO initialized successfully")
+except Exception as e:
+    logger.error(f"SocketIO initialization failed: {e}")
+    logger.error("Server will run without real-time overlay updates")
+    # Create minimal socketio stub
+    class SocketIOStub:
+        def emit(self, *args, **kwargs): pass
+        def on(self, event): 
+            def decorator(f): return f
+            return decorator
+    socketio = SocketIOStub()
 
 # Global state
 last_play_time: float = 0
