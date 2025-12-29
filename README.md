@@ -6,4 +6,4 @@ Elvenlabs AI SFX generation through Kick chat with a credit system using subs an
 🤓 [Usage guide/tips](https://github.com/ft78crdl/KICK-ELEVENLABS-SFX/wiki/Usage)  
 💬 [Commands](https://github.com/ft78crdl/KICK-ELEVENLABS-SFX/wiki/Commands)  
 
-Note: the setup guid uses a .EXE built with PyInstaller. If you're schizo (😳👉👈) feel free to review the code and build the .EXE yourself or run the .py directly. 
+Note: the setup guid uses a .EXE built with PyInstaller. If you're schizo (😳👉👈) feel free to review the code and build the .EXE yourself or run the .py directly using `built.bat`. 
